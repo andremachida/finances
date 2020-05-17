@@ -1,5 +1,10 @@
 version: '3'
 services:
+  api:
+    build: .
+    ports:
+      - "4000:4000"
+    command: npm start
   prisma:
     image: prismagraphql/prisma:1.28
     restart: always
