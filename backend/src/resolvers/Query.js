@@ -1,3 +1,4 @@
+const moment = require('moment')
 const { getuserId } = require('./../utils')
 
 function user(_, args, context, info) {
@@ -50,8 +51,37 @@ function categories(_, { operation }, context, info) {
   }, info)
 }
 
+function records(_, { type, accountsIds, categoriesIds, month }, context, info) {
+  const userId = getuserId(context)
+
+  let AND = [ { user: { id: userId } } ]
+  AND = !type ? AND : [ ...AND, { type } ]
+  AND = !accountsIds || accountsIds.length === 0
+    ? AND : [ ...AND, { OR: accountsIds.map(id => ({ account: { id } })) } ]
+  AND = !categoriesIds || categoriesIds.length === 0
+    ? AND : [ ...AND, { OR: categoriesIds.map(id => ({ category: { id } })) } ]
+
+  if (month) {
+    const date = moment(month, 'MM-YYYY')
+    const startDate = date.startOf('month').toISOString()
+    const endDate = date.endOf('month').toISOString()
+
+    AND = [
+      ...AND,
+      { date_gte: startDate },
+      { date_lte: endDate }
+    ]
+  }
+
+  return context.db.query.records({
+    where: { AND },
+    orderBy: 'date_ASC'
+  }, info)
+}
+
 module.exports = {
   user,
   accounts,
-  categories
+  categories,
+  records
 }

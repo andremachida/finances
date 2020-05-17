@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
+const moment = require('moment')
 const { getuserId } = require('./../utils')
 
 const JWT_SECRET = process.env.JWT_SECRET
@@ -64,9 +65,39 @@ function createCategory(_, { description, operation }, context, info) {
   }, info)
 }
 
+function createRecord(_, args, context, info) {
+  const date = moment(args.date)
+  if (!date.isValid()) {
+    throw new Error('Invalid Date!')
+  }
+  
+  const userId = getuserId(context)
+
+  return context.db.mutation.createRecord({
+    data: {
+      user: {
+        connect: { id: userId }
+      },
+      account: {
+        connect: { id: args.accountId }
+      },
+      category: {
+        connect: { id: args.categoryId }
+      },
+      amount: args.amount,
+      type: args.type,
+      date: args.date,
+      description: args.description,
+      tags: args.tags,
+      note: args.note,
+    }
+  }, info)
+}
+
 module.exports = {
   login,
   signup,
   createAccount,
-  createCategory
+  createCategory,
+  createRecord
 }
