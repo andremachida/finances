@@ -34,7 +34,7 @@ async function signup(_, args, context, info) {
   }
 }
 
-async function createAccount(_, { description }, context, info) {
+function createAccount(_, { description }, context, info) {
   const userId = getuserId(context)
   return context.db.mutation.createAccount({
     data: {
@@ -48,8 +48,25 @@ async function createAccount(_, { description }, context, info) {
   }, info)
 }
 
+function createCategory(_, { description, operation }, context, info) {
+  const userId = getuserId(context)
+
+  return context.db.mutation.createCategory({
+    data: {
+      description,
+      operation,
+      user: {
+        connect: {
+          id: userId
+        }
+      }
+    }
+  }, info)
+}
+
 module.exports = {
   login,
   signup,
-  createAccount
+  createAccount,
+  createCategory
 }
