@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken')
 
 const JWT_SECRET = process.env.JWT_SECRET
 
-async function login(_, { email, password }, ctx, info) {
-  const user = await ctx.db.query.user({ where: { email }})
+async function login(_, { email, password }, context, info) {
+  const user = await context.db.query.user({ where: { email }})
   if (!user) {
     throw new Error('Email not found!')
   }
@@ -22,9 +22,9 @@ async function login(_, { email, password }, ctx, info) {
   }
 }
 
-async function signup(_, args, ctx, info) {
+async function signup(_, args, context, info) {
   const password = await bcrypt.hash(args.password, 10)
-  const user = await ctx.db.mutation.createUser({ data: { ...args, password }})
+  const user = await context.db.mutation.createUser({ data: { ...args, password }})
   const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '2h' })
 
   return {

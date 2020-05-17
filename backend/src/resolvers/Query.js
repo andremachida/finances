@@ -1,5 +1,8 @@
-function user(_, args, ctx, info) {
-  return ctx.db.query.user({ where: { id: args.id }}, info)
+const { getuserId } = require('./../utils')
+
+function user(_, args, context, info) {
+  const userId = getuserId(context)
+  return context.db.query.user({ where: { id: userId }}, info)
 }
 
 module.exports = {
