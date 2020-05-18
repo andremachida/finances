@@ -13,6 +13,10 @@ type Query {
     """
     month: String
   ): [ Record! ]!
+  """
+    Year, Month and Day, format "YYYY-MM-DD" e.g.: 2020-05-17
+  """
+  totalBalance(date: Date!): Float!
 }
 
 type Mutation {
