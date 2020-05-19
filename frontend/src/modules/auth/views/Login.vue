@@ -146,7 +146,9 @@ export default {
   },
   methods: {
     async submit () {
-      const authData = await AuthService.login(this.user)
+      const authData = this.isLogin ? await AuthService.login(this.user)
+        : await AuthService.signup(this.user)
+
       console.log(authData)
     }
   }
