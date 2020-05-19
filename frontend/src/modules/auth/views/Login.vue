@@ -54,7 +54,7 @@
               {{ texts.toolbar }}
             </v-btn>
           </v-card-actions>
-          <v-snackbar top
+          <v-snackbar
             v-model="showSnackBar">
             {{ error }}
             <v-btn color="pink" text icon
@@ -168,6 +168,8 @@ export default {
       try {
         this.isLogin ? await AuthService.login(this.user)
           : await AuthService.signup(this.user)
+
+        this.$router.push(this.$route.query.redirect || '/dashboard')
       } catch (error) {
         this.error = formatError(error.message)
         this.showSnackBar = true
