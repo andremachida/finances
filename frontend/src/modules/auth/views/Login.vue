@@ -4,10 +4,19 @@
       <v-flex xs12 sm6>
         <v-card class="elevation-12">
           <v-toolbar color="primary">
-            <v-toolbar-title>Login</v-toolbar-title>
+            <v-toolbar-title>{{ texts.toolbar }}</v-toolbar-title>
           </v-toolbar>
           <v-card-text>
             <v-form>
+              <v-text-field
+                v-if="!isLogin"
+                v-model.trim="$v.user.name.$model"
+                prepend-icon="person"
+                name="name"
+                label="Name"
+                type="text"
+                :error-messages="nameErrors"
+                :success="!$v.user.name.$invalid" />
               <v-text-field
                 v-model.trim="$v.user.email.$model"
                 prepend-icon="email"
@@ -25,8 +34,9 @@
                 :error-messages="passwordErrors"
                 :success="!$v.user.password.$invalid" />
             </v-form>
-            <v-btn block depressed>
-              Create Account
+            <v-btn block depressed
+              @click="isLogin = !isLogin">
+              {{ texts.button }}
             </v-btn>
           </v-card-text>
           <v-card-actions>
@@ -36,7 +46,7 @@
               color="primary"
               large
               @click="submit">
-              Login
+              {{ texts.toolbar }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -75,25 +85,60 @@ export default {
       !password.minLength && errors.push(`Insert at Least ${password.$params.minLength.min} Characters`)
 
       return errors
+    },
+    nameErrors () {
+      const errors = []
+      const name = this.$v.user.name
+
+      if (!name.$dirty) {
+        return errors
+      }
+
+      !name.required && errors.push('Name Required.')
+      !name.minLength && errors.push(`Insert at Least ${name.$params.minLength.min} Characters`)
+
+      return errors
+    },
+    texts () {
+      return this.isLogin ? { toolbar: 'Login', button: 'Create Account' }
+        : { toolbar: 'Create Account', button: 'Already Registered' }
     }
   },
   data () {
     return {
       user: {
+        name: '',
         email: '',
         password: ''
-      }
+      },
+      isLogin: true
     }
   },
-  validations: {
-    user: {
-      email: {
-        required,
-        email
-      },
-      password: {
-        required,
-        minLength: minLength(3)
+  validations () {
+    const validations = {
+      user: {
+        email: {
+          required,
+          email
+        },
+        password: {
+          required,
+          minLength: minLength(3)
+        }
+      }
+    }
+
+    if (this.isLogin) {
+      return validations
+    }
+
+    return {
+      user: {
+        ...validations.user,
+        name: {
+          required,
+          minLength: minLength(3)
+        }
       }
     }
   },
