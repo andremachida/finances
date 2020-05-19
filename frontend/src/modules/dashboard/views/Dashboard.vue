@@ -1,12 +1,17 @@
 <template>
   <div>
-    <h1>Dashboard</h1>
+    <AppLayout />
   </div>
 </template>
 
 <script>
-export default {
+import AppLayout from '../components/AppLayout.vue'
 
+export default {
+  name: 'Dashboard',
+  components: {
+    AppLayout
+  }
 }
 </script>
 
