@@ -12,9 +12,9 @@
         </v-list-item-icon>
       </v-list-item>
       <v-list-item>
-        <v-list-item-icon>
+        <v-list-item-avatar>
           <v-icon>person</v-icon>
-        </v-list-item-icon>
+        </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title>{{ user.name }}</v-list-item-title>
         </v-list-item-content>

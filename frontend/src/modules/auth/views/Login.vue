@@ -120,19 +120,17 @@ export default {
         : { toolbar: 'Create Account', button: 'Already Registered' }
     }
   },
-  data () {
-    return {
-      user: {
-        name: '',
-        email: '',
-        password: ''
-      },
-      isLogin: true,
-      isLoading: false,
-      error: undefined,
-      showSnackBar: false
-    }
-  },
+  data: () => ({
+    user: {
+      name: '',
+      email: '',
+      password: ''
+    },
+    isLogin: true,
+    isLoading: false,
+    error: undefined,
+    showSnackBar: false
+  }),
   validations () {
     const validations = {
       user: {
