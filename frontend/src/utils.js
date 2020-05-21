@@ -20,8 +20,23 @@ const currencyFormatter = ({ locale, currency } = { locale: 'pt-BR', currency: '
   })
 }
 
+const groupBy = (array, key, makeCurrentKey) => {
+  return array.reduce((accumulated, item) => {
+    const currentKey = makeCurrentKey(item, key)
+
+    return {
+      ...accumulated,
+      [currentKey]: [
+        ...(accumulated[currentKey] || []),
+        item
+      ]
+    }
+  }, {})
+}
+
 export {
   formatError,
   errorHandler,
-  currencyFormatter
+  currencyFormatter,
+  groupBy
 }
