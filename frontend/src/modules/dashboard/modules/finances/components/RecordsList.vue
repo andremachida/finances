@@ -1,5 +1,6 @@
 <template>
   <div>
+    <TotalBalance />
     <ToolbarByMonth
       format="MM-YYYY"
       @month="changeMonth"
@@ -45,12 +46,14 @@ import RecordsService from '../services/records-service.js'
 
 import RecordsListItem from './RecordsListItem.vue'
 import ToolbarByMonth from './ToolbarByMonth.vue'
+import TotalBalance from './TotalBalance.vue'
 
 export default {
   name: 'RecordsList',
   components: {
     RecordsListItem,
-    ToolbarByMonth
+    ToolbarByMonth,
+    TotalBalance
   },
   mixins: [
     amountColorMixin,
