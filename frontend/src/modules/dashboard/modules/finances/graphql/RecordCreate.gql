@@ -1,4 +1,5 @@
 # import * from './Operation.gql'
+#import './RecordFragment.gql'
 
 mutation RecordCreate ($type: Operation!, $amount: Float!, $accountId: ID!, $categoryId: ID!,
   $date: Date!, $description: String!, $tags: String, $note: String) {
@@ -12,26 +13,6 @@ mutation RecordCreate ($type: Operation!, $amount: Float!, $accountId: ID!, $cat
     tags: $tags,
     note: $note
   ) {
-    id
-    type
-    amount
-  	date
-    description
-    note
-    tags
-    user {
-      id
-      name
-      email
-    }
-    account {
-      id
-      description
-    }
-    category {
-      id
-      description
-      operation
-    }
+    ...RecordFragment
   }
 }
