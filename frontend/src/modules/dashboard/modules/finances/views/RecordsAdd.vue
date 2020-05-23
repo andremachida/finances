@@ -49,7 +49,17 @@
                 name="account"
                 label="Account"
                 prepend-icon="account_balance">
-
+                <v-list-item ripple
+                  slot="prepend-item"
+                  @click="add('account')">
+                  <v-list-item-icon>
+                    <v-icon>add</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-title>Account</v-list-item-title>
+                </v-list-item>
+                <v-divider
+                  slot="prepend-item"
+                  class="mt-2"></v-divider>
               </v-select>
               <v-select
                 v-model="$v.record.categoryId.$model"
@@ -59,7 +69,17 @@
                 name="category"
                 label="Category"
                 prepend-icon="class">
-
+                <v-list-item ripple
+                  slot="prepend-item"
+                  @click="add('category')">
+                  <v-list-item-icon>
+                    <v-icon>add</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-title>Category</v-list-item-title>
+                </v-list-item>
+                <v-divider
+                  slot="prepend-item"
+                  class="mt-2"></v-divider>
               </v-select>
               <v-text-field
                 v-model.trim="$v.record.description.$model"
@@ -124,6 +144,15 @@
           @click="submit">
           <v-icon>check</v-icon>
         </v-btn>
+        <v-dialog persistent
+          v-model="showAccountCategoryDialog"
+          max-width="350px">
+          <AccountCategoryAdd
+            v-if="showAccountCategoryDialog"
+            :entity="entity"
+            @close="showAccountCategoryDialog = false"
+            @saved="accountCategorySaved" />
+        </v-dialog>
       </v-flex>
     </v-layout>
   </v-container>
@@ -131,6 +160,10 @@
 
 <script>
 import moment from 'moment'
+import { mapActions } from 'vuex'
+import { Subject } from 'rxjs'
+import { distinctUntilChanged, mergeMap } from 'rxjs/operators'
+
 import { decimal, minLength, required } from 'vuelidate/lib/validators'
 
 import AccountsService from '../services/accounts-service'
@@ -138,13 +171,13 @@ import CategoriesService from '../services/categories-service'
 import RecordsService from '../services/records-service'
 
 import NumericDisplay from '../components/NumericDisplay.vue'
-
-import { mapActions } from 'vuex'
+import AccountCategoryAdd from '../components/AccountCategoryAdd.vue'
 
 export default {
   name: 'RecordsAdd',
   components: {
-    NumericDisplay
+    NumericDisplay,
+    AccountCategoryAdd
   },
   computed: {
     color () {
@@ -178,7 +211,10 @@ export default {
       showNoteInput: false,
       showTagsInput: false,
       showDateDialog: false,
-      dateDialogValue: moment().format('YYYY-MM-DD')
+      dateDialogValue: moment().format('YYYY-MM-DD'),
+      showAccountCategoryDialog: false,
+      entity: '',
+      operationSubject$: new Subject()
     }
   },
   validations: {
@@ -218,6 +254,14 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+    add (entity) {
+      this.showAccountCategoryDialog = true
+      this.entity = entity
+    },
+    accountCategorySaved (item) {
+      this.showAccountCategoryDialog = false
+      this.record[`${this.entity}Id`] = item.id
     }
   },
   async beforeRouteUpdate (to, from, next) {
@@ -225,13 +269,19 @@ export default {
     this.changeTitle(type)
     this.record.type = type.toUpperCase()
     this.record.categoryId = ''
-    this.categories = await CategoriesService.categories({ operation: type })
+    this.operationSubject$.next(type)
     next()
   },
   async created () {
     this.changeTitle(this.$route.query.type)
-    this.accounts = await AccountsService.accounts()
-    this.categories = await CategoriesService.categories({ operation: this.$route.query.type })
+    AccountsService.accounts()
+      .subscribe(accounts => (this.accounts = accounts))
+    this.operationSubject$
+      .pipe(
+        distinctUntilChanged(),
+        mergeMap(operation => CategoriesService.categories({ operation }))
+      ).subscribe(categories => (this.categories = categories))
+    this.operationSubject$.next(this.$route.query.type)
   }
 }
 </script>
