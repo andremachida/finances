@@ -135,6 +135,7 @@ import { decimal, minLength, required } from 'vuelidate/lib/validators'
 
 import AccountsService from '../services/accounts-service'
 import CategoriesService from '../services/categories-service'
+import RecordsService from '../services/records-service'
 
 import NumericDisplay from '../components/NumericDisplay.vue'
 
@@ -210,8 +211,13 @@ export default {
       this.showDateDialog = false
       this.dateDialogValue = this.record.date
     },
-    submit () {
-      console.log(this.record)
+    async submit () {
+      try {
+        await RecordsService.createRecord(this.record)
+        this.$router.push('/dashboard/records')
+      } catch (error) {
+        console.log(error)
+      }
     }
   },
   async beforeRouteUpdate (to, from, next) {
