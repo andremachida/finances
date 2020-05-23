@@ -214,7 +214,8 @@ export default {
       dateDialogValue: moment().format('YYYY-MM-DD'),
       showAccountCategoryDialog: false,
       entity: '',
-      operationSubject$: new Subject()
+      operationSubject$: new Subject(),
+      subscriptions: []
     }
   },
   validations: {
@@ -274,14 +275,22 @@ export default {
   },
   async created () {
     this.changeTitle(this.$route.query.type)
-    AccountsService.accounts()
-      .subscribe(accounts => (this.accounts = accounts))
-    this.operationSubject$
-      .pipe(
-        distinctUntilChanged(),
-        mergeMap(operation => CategoriesService.categories({ operation }))
-      ).subscribe(categories => (this.categories = categories))
+    this.subscriptions.push(
+      AccountsService.accounts()
+        .subscribe(accounts => (this.accounts = accounts))
+    )
+    this.subscriptions.push(
+      this.operationSubject$
+        .pipe(
+          distinctUntilChanged(),
+          mergeMap(operation => CategoriesService.categories({ operation }))
+        ).subscribe(categories => (this.categories = categories))
+    )
+
     this.operationSubject$.next(this.$route.query.type)
+  },
+  destroyed () {
+    this.subscriptions.forEach(s => s.unsubscribe())
   }
 }
 </script>
