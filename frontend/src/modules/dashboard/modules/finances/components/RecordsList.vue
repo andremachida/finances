@@ -39,6 +39,9 @@
 
 <script>
 import moment from 'moment'
+import { Subject } from 'rxjs'
+import { mergeMap } from 'rxjs/operators'
+
 import { groupBy } from '../../../../../utils'
 import amountColorMixin from '../mixins/amoun-color'
 import formatCurrencyMixin from '../../../../../mixins/format-currency'
@@ -60,12 +63,13 @@ export default {
     formatCurrencyMixin
   ],
   data: () => ({
-    records: []
+    records: [],
+    monthSubject$: new Subject()
   }),
   computed: {
     mappedRecords () {
       return groupBy(this.records, 'date', (record, dateKey) => {
-        return moment(record[dateKey]).format('DD/MM/YYYY')
+        return moment(record[dateKey].substr(0, 10)).format('DD/MM/YYYY')
       })
     },
     totalAmount () {
@@ -89,11 +93,17 @@ export default {
         path: this.$route.path,
         query: { month }
       })
-      this.setRecords(month)
+      this.monthSubject$.next({ month })
     },
-    async setRecords (month) {
-      this.records = await RecordsService.records({ month })
+    setRecords (month) {
+      this.monthSubject$
+        .pipe(
+          mergeMap(variables => RecordsService.records(variables))
+        ).subscribe(records => (this.records = records))
     }
+  },
+  created () {
+    this.setRecords()
   }
 }
 </script>
