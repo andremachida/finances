@@ -58,7 +58,8 @@ export default {
     items: [
       { title: 'Home', icon: 'dashboard', url: '/dashboard', exact: true },
       { title: 'Credit', icon: 'add', url: '/dashboard/records/add?type=credit', exact: true },
-      { title: 'Debit', icon: 'remove', url: '/dashboard/records/add?type=debit', exact: true }
+      { title: 'Debit', icon: 'remove', url: '/dashboard/records/add?type=debit', exact: true },
+      { title: 'Reports', icon: 'assessment', url: '/dashboard/reports', exact: true }
     ],
     mini: false,
     user: {}
